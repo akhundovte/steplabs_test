@@ -1,0 +1,37 @@
+version: "3.5"
+services:
+    steplabs_test:
+        image: steplabs_test:latest
+        container_name: steplabs_test_project
+        build: .
+        # command: ["sleep", "365d"]
+        command: uvicorn main:app --reload --host 0.0.0.0 --port 8080
+        working_dir: /src
+        volumes:
+            - "../../:/src"
+        networks:
+            - net_steplabs_test
+        ports:
+            - 8080:8080
+        depends_on:
+            - db
+        env_file:
+            - ./.env
+
+    db:
+        image: postgres:9.6.steplabs_test
+        container_name: steplabs_test_db
+        build: ./pg
+        volumes:
+            - "dbdata:/var/lib/postgresql/data"
+        networks:
+            - net_steplabs_test
+        environment:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_USER: postgres
+volumes:
+    dbdata:
+
+networks:
+    net_steplabs_test:
+        name: network_steplabs_test
